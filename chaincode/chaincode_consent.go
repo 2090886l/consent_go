@@ -73,6 +73,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.write(stub, args)
 	} else if function == "initUser" {
 		return t.initUser(stub, args)
+	} else if function == "setConsent" {
+		return t.setConsent(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
