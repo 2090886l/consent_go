@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -70,6 +71,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.Init(stub, "init", args)
 	} else if function == "write" {
 		return t.write(stub, args)
+	} else if function == "initUser" {
+		return t.initUser(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
@@ -154,6 +157,38 @@ func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []stri
 		return nil, err
 	}
 
-	fmt.Println("- end init marble")
+	fmt.Println("- end init user")
+	return nil, nil
+}
+
+func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+
+	//   0       1
+	// "name", "true/false"
+	if len(args) < 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	}
+
+	fmt.Println("- start set user")
+	fmt.Println(args[0] + " - " + args[1])
+	userAsBytes, err := stub.GetState(args[0])
+	if err != nil {
+		return nil, errors.New("Failed to get user")
+	}
+	res := User{}
+	json.Unmarshal(userAsBytes, &res)             //un stringify it aka JSON.parse()
+	res.Consent, err = strconv.ParseBool(args[1]) //change the consent
+	if err != nil {
+		return nil, errors.New("Conesnt could not be parsed")
+	}
+
+	jsonAsBytes, _ := json.Marshal(res)
+	err = stub.PutState(args[0], jsonAsBytes) //rewrite the marble with id as key
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("- end set consent")
 	return nil, nil
 }
