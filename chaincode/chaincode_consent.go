@@ -152,9 +152,10 @@ func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []stri
 
 	//check if user already exists?
 
-	//build the marble json string manually
-	str := `{"name": "` + name + `", "key": "` + strconv.Itoa(key) + `", "consent": ` + strconv.FormatBool(consent) + `"}`
-	err = stub.PutState(name, []byte(str)) //store marble with id as key
+	//build the user json string manually
+	str := `{"name": "` + name + `", "key": "` + strconv.Itoa(key) + `", "consent": "` + strconv.FormatBool(consent) + `"}`
+	fmt.Println(str)
+	err = stub.PutState(name, []byte(str)) //store user with id as key
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +180,8 @@ func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []st
 		return nil, errors.New("Failed to get user")
 	}
 	res := User{}
-	json.Unmarshal(userAsBytes, &res)             //un stringify it aka JSON.parse()
+	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
+	fmt.Println(res)
 	res.Consent, err = strconv.ParseBool(args[1]) //change the consent
 	if err != nil {
 		return nil, errors.New("Conesnt could not be parsed")
