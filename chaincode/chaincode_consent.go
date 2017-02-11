@@ -221,7 +221,7 @@ func (t *SimpleChaincode) getKey(stub shim.ChaincodeStubInterface, args []string
 		return nil, errors.New("Consent not granted, cannot access key")
 	}
 
-	jsonAsBytes, _ := json.Marshal(res.Consent)
+	jsonAsBytes, _ := json.Marshal(res.Key)
 	fmt.Println(jsonAsBytes)
 	fmt.Println("- end get key")
 	return jsonAsBytes, nil
