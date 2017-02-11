@@ -33,7 +33,7 @@ type SimpleChaincode struct {
 // User simple User implementation
 type User struct {
 	Name    string `json:"name"`
-	Key     int64  `json:"key"`
+	Key     string `json:"key"`
 	Consent bool   `json:"consent"`
 }
 
@@ -188,6 +188,7 @@ func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []st
 	}
 
 	jsonAsBytes, _ := json.Marshal(res)
+	fmt.Println(jsonAsBytes)
 	err = stub.PutState(args[0], jsonAsBytes) //rewrite the marble with id as key
 	if err != nil {
 		return nil, err
