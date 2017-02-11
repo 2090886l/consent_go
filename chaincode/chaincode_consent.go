@@ -197,3 +197,31 @@ func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []st
 	fmt.Println("- end set consent")
 	return nil, nil
 }
+
+func (t *SimpleChaincode) getKey(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+
+	//   0
+	// "name",
+	if len(args) != 1 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 1")
+	}
+
+	fmt.Println("- start get key")
+	userAsBytes, err := stub.GetState(args[0])
+	if err != nil {
+		return nil, errors.New("Failed to get user")
+	}
+	res := User{}
+	fmt.Println(res)
+	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
+	if !res.Consent {
+		return nil, errors.New("Consent not granted, cannot access key")
+	}
+
+	jsonAsBytes, _ := json.Marshal(res.Consent)
+	fmt.Println(jsonAsBytes)
+	fmt.Println("- end get key")
+	return jsonAsBytes, nil
+
+}
