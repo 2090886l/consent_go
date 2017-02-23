@@ -1,0 +1,14 @@
+{
+  "name": "consent",
+  "version": "1.0.0",
+  "description": "A web app designed to interact with the conesnt chaincode",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Ivaylo Lafchiev",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.1"
+  }
+}
