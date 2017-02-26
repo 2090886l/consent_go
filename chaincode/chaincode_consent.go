@@ -159,10 +159,6 @@ func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []stri
 	withdrawl := false
 
 	//check if user already exists?
-	userAsBytes, err := stub.GetState(args[0])
-	if err == nil {
-		return userAsBytes, errors.New("User already exists")
-	}
 
 	//build the user json string manually
 	str := `{"name": "` + name + `", "key": "` + strconv.Itoa(key) + `", "consent": "` + strconv.FormatBool(consent) + `", "withdrawl": "` + strconv.FormatBool(withdrawl) + `"}`
