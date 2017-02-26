@@ -255,8 +255,13 @@ func (t *SimpleChaincode) getWithdrawl(stub shim.ChaincodeStubInterface, args []
 		return nil, errors.New("Failed to get user")
 	}
 	res := User{}
-	fmt.Println(res)
+
 	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
+	fmt.Println(res)
+	if res.Name != args[0] {
+		return nil, errors.New("User does not exist")
+	}
+
 	jsonAsBytes, _ := json.Marshal(res.Withdrawl)
 	fmt.Println(jsonAsBytes)
 	fmt.Println("- end get key")

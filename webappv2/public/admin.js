@@ -5,10 +5,10 @@ var myKeyVals =       {
         "params": {
             "type": 1,
             "chaincodeID": {
-            "name": "cd2696a855af534ab8187c8577b16da839d5e4d1fd457631daf0c4e5086ac45d9e0680644dd64163a8b8096482df44a867c6bb5573f9ca3cd52ac1edf4e92128"
+            "name": "e41a3acd56dbda1c1c8af033b9278a90a3c7d31ee24d66a386c98358b5315c3b6eafbf95f89ada1da774c6bd57be2593e25626648cd1eb11c98017b567777771"
             },
             "ctorMsg": {
-            "function": "getKey",
+            "function": "getWithdrawl",
             "args": [
                 "test"
             ]
@@ -20,7 +20,7 @@ var myKeyVals =       {
 
 var user = "test";
 
-function getKey() {
+function getWithdrawl() {
      $('#output').empty();
     var input = document.getElementById("get").value;
     myKeyVals.params.ctorMsg.args = [input];
@@ -34,9 +34,17 @@ function getKey() {
             console.log(resultData)
            
             if (resultData.error == null || resultData.error == undefined) {
-                
-                $('#output').append('<h1 class="text-success">Success</h1><p class="lead">' + 'Key for user "' + input + '" : ' + resultData.result.message.replace(/\"/g, "") + '</p>');
-                console.log(resultData.result.message);
+                var message = resultData.result.message.replace(/\"/g, "");
+                console.log (message);
+                if (message == "true") {
+                    $('#output').append('<h1 class="text-danger">User has withdrawn from the study</h1>');
+                }
+                else if (message == "false") {
+                    $('#output').append('<h1 class="text-success">User has not withdrawn from the study</h1>');
+                }
+                else {
+                    $('#output').append('<h1 class="text-warning">An error has occured</h1>');
+                }
             }
             else {
                 $('#output').append('<h1 class="text-danger">Error</h1><p class="lead">' + resultData.error.data + '</p>');
