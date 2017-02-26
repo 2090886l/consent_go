@@ -5,7 +5,7 @@ var myKeyVals =       {
         "params": {
             "type": 1,
             "chaincodeID": {
-            "name": "1e118ce799633f4c821263784f8df37676527595194803ba87de840d740f12ce7f071ef35d8caf132738e86d5aefc2403a27c9790e16496f7ff5a04fdfa92acc"
+            "name": "5545d8dc7011990856f4c5f907f406c425d53e8f647ac889eccf143d2d8f1fcc590367860817cd2230f71c9624f984d4343a69b74c2d03bd3c56d129b6542514"
             },
             "ctorMsg": {
             "function": "setConsent",

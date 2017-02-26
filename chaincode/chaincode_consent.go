@@ -161,6 +161,7 @@ func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []stri
 	userAsBytes, err := stub.GetState(args[0])
 	res := User{}
 	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
+	fmt.Println(res)
 	if res.Name == args[0] {
 		return nil, errors.New("User already exists")
 	}
