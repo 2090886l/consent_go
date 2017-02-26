@@ -5,7 +5,7 @@ var myKeyVals =       {
         "params": {
             "type": 1,
             "chaincodeID": {
-            "name": "cd2696a855af534ab8187c8577b16da839d5e4d1fd457631daf0c4e5086ac45d9e0680644dd64163a8b8096482df44a867c6bb5573f9ca3cd52ac1edf4e92128"
+            "name": "1e118ce799633f4c821263784f8df37676527595194803ba87de840d740f12ce7f071ef35d8caf132738e86d5aefc2403a27c9790e16496f7ff5a04fdfa92acc"
             },
             "ctorMsg": {
             "function": "setConsent",
@@ -41,8 +41,44 @@ function consent(flag) {
                     $('#output').append('<h1 class="text-success">Consent granted for user "' + input + '"</h1>');
                 }
                 else {
-                    $('#output').append('<h1 class="text-danger">Consent revoked for user "' + input + '"</h1>');
+                    $('#output').append('<h1 class="text-danger">Consent paused for user "' + input + '"</h1>');
                 }
+                
+                console.log(resultData.result.message);
+            }
+            else {
+                $('#output').append('<h1 class="text-danger">Error</h1><p class="lead">' + resultData.error.data + '</p>');
+                console.log(resultData.error.data) 
+            }
+             
+        }
+
+    })
+}
+
+function withdraw() {
+     $('#output').empty();
+    var input = document.getElementById("example-text-input").value;
+    if (input === "") {
+        $('#output').append('<h1 class="text-warning">Enter a username</h1>');
+        return
+    }
+    var newKeyVals = jQuery.extend(true, {}, myKeyVals);
+    newKeyVals.params.ctorMsg.args = [input, "true"];
+    newKeyVals.params.ctorMsg.function = "setWithdrawl"
+    $.ajax({
+        type: "POST",
+        url: URL,
+        data: JSON.stringify(newKeyVals),
+        dataType: "text",
+        success: function(resultData) { 
+            resultData = JSON.parse(resultData);
+            console.log(resultData)
+            
+            if (resultData.error == null || resultData.error == undefined) {
+                $('#output').append('<h1 class="text-success"> User "' + input + '" withdrawn from study' + '</h1>');
+                
+
                 
                 console.log(resultData.result.message);
             }

@@ -158,7 +158,12 @@ func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []stri
 	consent := false
 	withdrawl := false
 
-	//check if user already exists?
+	userAsBytes, err := stub.GetState(args[0])
+	res := User{}
+	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
+	if res.Name == args[0] {
+		return nil, errors.New("User already exists")
+	}
 
 	//build the user json string manually
 	str := `{"name": "` + name + `", "key": "` + strconv.Itoa(key) + `", "consent": "` + strconv.FormatBool(consent) + `", "withdrawl": "` + strconv.FormatBool(withdrawl) + `"}`
@@ -189,7 +194,9 @@ func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []st
 	}
 	res := User{}
 	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
-	fmt.Println(res)
+	if res.Name != args[0] {
+		return nil, errors.New("User does not exist")
+	}
 	res.Consent, err = strconv.ParseBool(args[1]) //change the consent
 	if err != nil {
 		return nil, errors.New("Conesnt could not be parsed")
@@ -224,6 +231,9 @@ func (t *SimpleChaincode) setWithdrawl(stub shim.ChaincodeStubInterface, args []
 	res := User{}
 	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
 	fmt.Println(res)
+	if res.Name != args[0] {
+		return nil, errors.New("User does not exist")
+	}
 	res.Withdrawl, err = strconv.ParseBool(args[1]) //change the withdrawl
 	if err != nil {
 		return nil, errors.New("Conesnt could not be parsed")

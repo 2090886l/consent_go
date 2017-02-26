@@ -5,7 +5,7 @@ var myKeyVals =       {
         "params": {
             "type": 1,
             "chaincodeID": {
-            "name": "e41a3acd56dbda1c1c8af033b9278a90a3c7d31ee24d66a386c98358b5315c3b6eafbf95f89ada1da774c6bd57be2593e25626648cd1eb11c98017b567777771"
+            "name": "1e118ce799633f4c821263784f8df37676527595194803ba87de840d740f12ce7f071ef35d8caf132738e86d5aefc2403a27c9790e16496f7ff5a04fdfa92acc"
             },
             "ctorMsg": {
             "function": "getWithdrawl",
@@ -33,18 +33,22 @@ function getWithdrawl() {
             resultData = JSON.parse(resultData);
             console.log(resultData)
            
-            if (resultData.error == null || resultData.error == undefined) {
-                var message = resultData.result.message.replace(/\"/g, "");
-                console.log (message);
-                if (message == "true") {
-                    $('#output').append('<h1 class="text-danger">User has withdrawn from the study</h1>');
-                }
-                else if (message == "false") {
-                    $('#output').append('<h1 class="text-success">User has not withdrawn from the study</h1>');
+            if (resultData.error == null || resultData.error == undefined) { 
+                if (resultData.result.message == null || resultData.result.message == undefined) {
+                     $('#output').append('<h1 class="text-warning">User does not exist</h1>');
                 }
                 else {
-                    $('#output').append('<h1 class="text-warning">An error has occured</h1>');
+                    var message = resultData.result.message.replace(/\"/g, "");
+                    console.log (message);
+                    if (message == "true") {
+                        $('#output').append('<h1 class="text-danger">User has withdrawn from the study</h1>');
+                    }
+                    else if (message == "false") {
+                        $('#output').append('<h1 class="text-success">User has not withdrawn from the study</h1>');
+                    }
                 }
+
+  
             }
             else {
                 $('#output').append('<h1 class="text-danger">Error</h1><p class="lead">' + resultData.error.data + '</p>');
