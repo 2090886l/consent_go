@@ -1,15 +1,15 @@
-Author - Ivaylo Lafchiev (2090886l)
-This code is hosted on GitHub - https://github.com/2090886l/consent_go
+#This is a level 4 Software engineering project called "A Blockchain system for managing informed consent".
+#Author - Ivaylo Lafchiev (2090886l)
+#This code is hosted on GitHub - https://github.com/2090886l/consent_go
 
-This is a level 4 Software engineering project called "A Blockchain system for managing informed consent".
 
 It contains the source code for the chaincode and web applications for the initial and final designs.
 
-Initial design
+##Initial design
 /chaincode - contains the chaincode 
 /webapp - contains the Node.js application
 
-Final design - 
+##Final design - 
 /chaincode_v2 - contains the chaincode 
 /webapp_v2 - contains the Node.js application
 
