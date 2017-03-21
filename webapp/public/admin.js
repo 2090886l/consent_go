@@ -1,3 +1,9 @@
+/*
+Author - Ivaylo Lafchiev (2090886)
+JS Code for the admin panel
+*/
+
+// setting the location of the CC
 var URL = "https://8e18edcadb514940add0f29a2115b4d1-vp0.us.blockchain.ibm.com:5001/chaincode"
 var myKeyVals =       {
         "jsonrpc": "2.0",
@@ -20,6 +26,7 @@ var myKeyVals =       {
 
 var user = "test";
 
+// get key for user and update DOM
 function getKey() {
      $('#output').empty();
     var input = document.getElementById("get").value;
@@ -48,6 +55,7 @@ function getKey() {
     })
 }
 
+// initialise new user and update DOM
 function initUser() {
     $('#output').empty();
     var newKeyVals = jQuery.extend(true, {}, myKeyVals);

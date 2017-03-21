@@ -1,3 +1,8 @@
+/*
+Author - Ivaylo Lafchiev (2090886)
+Entry point to web application
+*/
+
 var express = require('express')
 var app = express()
 

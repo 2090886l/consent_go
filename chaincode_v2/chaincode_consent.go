@@ -1,6 +1,6 @@
 /*
 Author - Ivaylo Lafchiev (2090886)
-Initial design of consent management system
+Final design of consent management system
 */
 
 package main
@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -21,9 +22,9 @@ type SimpleChaincode struct {
 
 // User simple User implementation
 type User struct {
-	Name    string `json:"name"`
-	Key     string `json:"key"`
-	Consent bool   `json:"consent"`
+	Name      string `json:"name"`
+	Consent   bool   `json:"consent"`
+	Withdrawl bool   `json:"withdrawl"`
 }
 
 // ============================================================================================================================
@@ -64,6 +65,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.initUser(stub, args)
 	} else if function == "setConsent" {
 		return t.setConsent(stub, args)
+	} else if function == "setWithdrawl" {
+		return t.setWithdrawl(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
@@ -77,8 +80,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	// Handle different functions
 	if function == "read" { //read a variable
 		return t.read(stub, args)
-	} else if function == "getKey" {
-		return t.getKey(stub, args)
+	} else if function == "getWithdrawl" {
+		return t.getWithdrawl(stub, args)
 	}
 
 	fmt.Println("query did not find func: " + function)
@@ -86,7 +89,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	return nil, errors.New("Received unknown function query: " + function)
 }
 
-// function for testing of adding key value pairs
+// function for testing writing to blockchain
 func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var key, value string
 	var err error
@@ -105,7 +108,7 @@ func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string)
 	return nil, nil
 }
 
-// read a key's value the blockchain
+// function for testing reading key from blockchain
 func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var key, jsonResp string
 	var err error
@@ -124,8 +127,10 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 	return valAsbytes, nil
 }
 
+// initalise a user
 func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
+	rand.Seed(time.Now().UnixNano())
 	key := rand.Int()
 
 	//   0
@@ -142,9 +147,18 @@ func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []stri
 
 	name := args[0]
 	consent := false
+	withdrawl := false
+
+	userAsBytes, err := stub.GetState(args[0])
+	res := User{}
+	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
+	fmt.Println(res)
+	if res.Name == args[0] {
+		return nil, errors.New("User already exists")
+	}
 
 	//build the user json string manually
-	str := `{"name": "` + name + `", "key": "` + strconv.Itoa(key) + `", "consent": "` + strconv.FormatBool(consent) + `"}`
+	str := `{"name": "` + name + `", "key": "` + strconv.Itoa(key) + `", "consent": "` + strconv.FormatBool(consent) + `", "withdrawl": "` + strconv.FormatBool(withdrawl) + `"}`
 	fmt.Println(str)
 	err = stub.PutState(name, []byte(str)) //store user with id as key
 	if err != nil {
@@ -152,9 +166,10 @@ func (t *SimpleChaincode) initUser(stub shim.ChaincodeStubInterface, args []stri
 	}
 
 	fmt.Println("- end init user")
-	return nil, nil
+	return []byte(str), nil
 }
 
+// set the consent of the user to true or false
 func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
 
@@ -172,7 +187,9 @@ func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []st
 	}
 	res := User{}
 	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
-	fmt.Println(res)
+	if res.Name != args[0] {
+		return nil, errors.New("User does not exist")
+	}
 	res.Consent, err = strconv.ParseBool(args[1]) //change the consent
 	if err != nil {
 		return nil, errors.New("Conesnt could not be parsed")
@@ -180,7 +197,7 @@ func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []st
 
 	jsonAsBytes, _ := json.Marshal(res)
 	fmt.Println(jsonAsBytes)
-	err = stub.PutState(args[0], jsonAsBytes) //rewrite the marble with id as key
+	err = stub.PutState(args[0], jsonAsBytes) //rewrite the user
 	if err != nil {
 		return nil, err
 	}
@@ -189,8 +206,46 @@ func (t *SimpleChaincode) setConsent(stub shim.ChaincodeStubInterface, args []st
 	return nil, nil
 }
 
-// get decryption key of user
-func (t *SimpleChaincode) getKey(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+// withdraw user from study
+func (t *SimpleChaincode) setWithdrawl(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+
+	//   0       1
+	// "name", "true/false"
+	if len(args) < 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	}
+
+	fmt.Println("- start set withdrawl")
+	fmt.Println(args[0] + " - " + args[1])
+	userAsBytes, err := stub.GetState(args[0])
+	if err != nil {
+		return nil, errors.New("Failed to get user")
+	}
+	res := User{}
+	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
+	fmt.Println(res)
+	if res.Name != args[0] {
+		return nil, errors.New("User does not exist")
+	}
+	res.Withdrawl, err = strconv.ParseBool(args[1]) //change the withdrawl
+	if err != nil {
+		return nil, errors.New("Conesnt could not be parsed")
+	}
+
+	jsonAsBytes, _ := json.Marshal(res)
+	fmt.Println(jsonAsBytes)
+	err = stub.PutState(args[0], jsonAsBytes) //rewrite the user
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("- end set consent")
+	return nil, nil
+}
+
+// get the withdrawl status of a user
+func (t *SimpleChaincode) getWithdrawl(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
 
 	//   0
@@ -199,19 +254,20 @@ func (t *SimpleChaincode) getKey(stub shim.ChaincodeStubInterface, args []string
 		return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
 
-	fmt.Println("- start get key")
+	fmt.Println("- start get withdrawl")
 	userAsBytes, err := stub.GetState(args[0])
 	if err != nil {
 		return nil, errors.New("Failed to get user")
 	}
 	res := User{}
-	fmt.Println(res)
+
 	json.Unmarshal(userAsBytes, &res) //un stringify it aka JSON.parse()
-	if !res.Consent {
-		return nil, errors.New("Consent not granted, cannot access key")
+	fmt.Println(res)
+	if res.Name != args[0] {
+		return nil, errors.New("User does not exist")
 	}
 
-	jsonAsBytes, _ := json.Marshal(res.Key)
+	jsonAsBytes, _ := json.Marshal(res.Withdrawl)
 	fmt.Println(jsonAsBytes)
 	fmt.Println("- end get key")
 	return jsonAsBytes, nil

@@ -1,3 +1,9 @@
+/*
+Author - Ivaylo Lafchiev (2090886)
+JS code for user panel
+*/
+
+// setting location of CC
 var URL = "https://8e18edcadb514940add0f29a2115b4d1-vp0.us.blockchain.ibm.com:5001/chaincode"
 var myKeyVals =       {
         "jsonrpc": "2.0",
@@ -19,6 +25,7 @@ var myKeyVals =       {
     };
 var user = "test";
 
+// change user consent status and update DOM
 function consent(flag) {
     $('#output').empty();
     var input = document.getElementById("example-text-input").value;
